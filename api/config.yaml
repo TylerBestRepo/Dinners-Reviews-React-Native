@@ -1,0 +1,8 @@
+configurationset:
+  - configuration:
+      name: postgresql_config
+      uri: postgresql://ep-shrill-thunder-a71vn3nn.ap-southeast-2.aws.neon.tech/MyFitnessPalClone?user=MyFitnessPalClone_owner&password=CtfnShY5H7AI
+  - configuration:
+      name: edamam
+      app_id: e0a3c338
+      app_key: 88beb2ba7b626163e411eb8ffe75ee78
