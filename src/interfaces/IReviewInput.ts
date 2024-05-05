@@ -1,4 +1,4 @@
-export default interface IReviewInput {
+export interface IReviewInput {
     reviewer: string;
     cook: string;
     entreeRating: number;

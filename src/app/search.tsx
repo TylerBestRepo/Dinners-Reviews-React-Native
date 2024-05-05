@@ -4,7 +4,6 @@ import { StyleSheet, Text, View, FlatList, TextInput, Button, ActivityIndicator 
 import FoodListItem from '../components/FoodListItem';
 import { SearchBar } from 'react-native-screens';
 import { useState } from 'react';
-import { gql, useQuery, useLazyQuery } from '@apollo/client'
 import { Ionicons } from "@expo/vector-icons"
 
 import { Camera, CameraType } from 'expo-camera'

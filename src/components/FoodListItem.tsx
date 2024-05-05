@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet } from "react-native"
 import { AntDesign } from '@expo/vector-icons';
 
-import { gql, useMutation } from '@apollo/client'
 import { useRouter } from "expo-router";
 
 const mutation = gql`

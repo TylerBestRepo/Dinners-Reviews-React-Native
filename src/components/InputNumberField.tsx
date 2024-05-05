@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, ActivityIndicator, Button } from 'react-native';
-
+import { StyleSheet, Text, View, TextInput, ActivityIndicator, Button, Keyboard } from 'react-native';
 import { convertFieldString } from '../enum/fieldStrings';
 
 export default function inputField({field, onEmit }) {
@@ -14,6 +13,7 @@ export default function inputField({field, onEmit }) {
         }
         
     };
+
 
     return (
         <View style={{ flexDirection: "column", alignItems: 'center', gap: 10 }}>

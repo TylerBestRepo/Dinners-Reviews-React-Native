@@ -1,5 +1,5 @@
 enum FieldStrings {
-    entreeRating = 'Entertainment Rating',
+    entreeRating = 'Entree Rating',
     mainRating = 'Main Rating',
     dessertRating = 'Dessert Rating',
     entertainmentRating = 'Entertainment Rating',
