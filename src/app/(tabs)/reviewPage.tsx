@@ -3,14 +3,14 @@ import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity, Keyboard, T
 import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import InputNumberField from '../components/InputNumberField'
+import InputNumberField from '../../components/InputNumberField'
 import { SelectList } from 'react-native-dropdown-select-list'
 
-import { FIREBASE_DB } from "../../FirebaseConfig";
+import { FIREBASE_DB } from "../../../FirebaseConfig";
 import { collection, onSnapshot } from "firebase/firestore";
-import { IMembers, IHostedDinners, IReviewInput } from "../interfaces";
-import { getMembers } from "../api/gets";
-export default function HomeScreen() {
+import { IMembers, IHostedDinners, IReviewInput } from "../../interfaces";
+import { getMembers } from "../../api/gets";
+export default function reviewPage() {
 
     const membersRef = collection(FIREBASE_DB, "members")
 

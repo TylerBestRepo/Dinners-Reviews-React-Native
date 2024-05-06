@@ -1,10 +1,20 @@
+
 import { Tabs } from "expo-router"
+import { AntDesign } from '@expo/vector-icons';
 
 export default () => {
     return (
-        <Tabs>
-            <Tabs.Screen name="home"/>
-            <Tabs.Screen name="reviewPage"/>
+        <Tabs screenOptions={{ headerTitle: "", headerShown: false }}>
+            <Tabs.Screen name="home" options={{
+                title: 'Home', tabBarIcon: ({ color, size }) => (
+                    <AntDesign name="home" size={size} color={color} />
+                )
+            }} />            
+            <Tabs.Screen name="reviewPage" options={{
+                title: 'My Reviews', tabBarIcon: ({ color, size }) => (
+                    <AntDesign name="barschart" size={size} color={color} />
+                )
+            }} />
         </Tabs>
     )
 }
