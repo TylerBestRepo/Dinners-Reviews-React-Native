@@ -132,8 +132,9 @@ const index = () => {
 
     return (
         <View style={[styles.container, {
-            paddingTop: insets.top + 30,
-            paddingBottom: insets.bottom,
+            paddingTop: 15,
+            // paddingTop: insets.top + 30,
+            // paddingBottom: insets.bottom,
         }]}>
             <ScrollView style={styles.scrollContainer}>
 
