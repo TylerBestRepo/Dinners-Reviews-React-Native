@@ -1,3 +1,5 @@
 export * from './IHostedDinners'
 export * from './IMembers'
 export * from './IReviewInput'
+export * from './IReviews'
+export * from './IMysteryQuestion'

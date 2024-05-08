@@ -74,7 +74,7 @@ const index = () => {
                 console.error('Error fetching members:', error);
             }
         };
-    
+
         fetchDinners();
     }, []);
 
@@ -102,7 +102,7 @@ const index = () => {
 
     const renderDinners = () => {
         return dinners.map((dinner) => (
-            <View key={dinner.id} style={styles.card }>
+            <View key={dinner.id} style={styles.card}>
                 {/* Render dinner information here */}
                 <View style={styles.topContainer}>
                     <Text style={styles.topText}>
@@ -111,21 +111,21 @@ const index = () => {
                 </View>
 
                 <View style={styles.middleContainer}>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                         <Text style={[styles.boldText, styles.middleText]}>Host: </Text>
                         <Text style={styles.middleText}>{dinner.hostName}</Text>
                     </View>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                         <Text style={[styles.boldText, styles.middleText]}>Date: </Text>
                         <Text style={styles.middleText}>{dinner.date.toLocaleDateString()}</Text>
                     </View>
                 </View>
                 <Image borderRadius={6}
-                            source={getHostImage(dinner.hostName)}
-                            resizeMode='cover'
-                            //  style={{ height: 200, width: 150, borderRadius: 16 }}
-                            style={styles.imageSmall }
-                        />
+                    source={getHostImage(dinner.hostName)}
+                    resizeMode='cover'
+                    //  style={{ height: 200, width: 150, borderRadius: 16 }}
+                    style={styles.imageSmall}
+                />
             </View>
         ));
     };
@@ -136,11 +136,11 @@ const index = () => {
             // paddingTop: insets.top + 30,
             // paddingBottom: insets.bottom,
         }]}>
-            <ScrollView style={styles.scrollContainer}>
+            <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollContainer}>
 
-                <Text style={styles.header}>Dinner Reviews</Text>
+                {/* <Text style={styles.header}>Dinner Reviews</Text> */}
 
-                <View style={styles.imageAndOther}>
+                {/* <View style={styles.imageAndOther}>
                     <TouchableOpacity onPress={playSound}>
                         <Animated.Image borderRadius={6}
                             source={tinoImg}
@@ -149,9 +149,12 @@ const index = () => {
                             style={[styles.image, animatedStyle]}
                         />
                     </TouchableOpacity>
-
+                </View> */}
+                <View style={styles.upcomingContainer}>
+                    <View style={styles.upcoming}>
+                        <Text style={styles.header}>Upcoming:</Text>
+                    </View>
                     <View style={styles.cardsContainer}>{renderDinners()}</View>
-
                 </View>
             </ScrollView>
 
@@ -173,16 +176,29 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        fontSize: 32,
-        fontWeight: "800",
+        marginTop: 12,
+        fontSize: 38,
+        fontWeight: "600",
+    },
+    upcoming: {
+        width: '65%',
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
     },
     imageAndOther: {
         width: '100%',
-        marginTop: 30,
+        marginTop: 10,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start'
+
+    },
+    upcomingContainer: {
+        width: '100%',
+        marginTop: 10,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center'
-
     },
     image: {
         width: 150,
@@ -191,13 +207,13 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
     imageSmall: {
-        width: 50,
-        height: 70,
-        borderRadius: 16,
+        width: 60,
+        height: 75,
+        borderRadius: 34,
         resizeMode: 'cover',
     },
     cardsContainer: {
-        marginTop: 20,
+        marginTop: 0,
         flexDirection: 'column',
         justifyContent: 'center',
     },
@@ -223,24 +239,25 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     topContainer: {
-          marginTop: 10,
-          marginBottom: 10,
+        marginTop: 10,
+        marginBottom: 10,
 
         alignItems: 'center',
     },
     middleContainer: {
         flexDirection: 'column',
+        gap: 4,
         alignItems: 'center',
     },
     topText: {
-      fontWeight: 'bold',
-      fontSize: 18,
-      color: '#5C6EB5'
+        fontWeight: 'bold',
+        fontSize: 18,
+        color: '#5C6EB5'
     },
     middleText: {
-      fontSize: 16
+        fontSize: 16
     },
     boldText: {
-      fontWeight: 'bold',
+        fontWeight: 'bold',
     },
 })

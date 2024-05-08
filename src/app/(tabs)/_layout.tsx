@@ -59,8 +59,17 @@ MaterialTopTabNavigationEventMap
 >(Navigator);
 
 const Layout = () => (
-    <MaterialTopTabs>
-
+    <MaterialTopTabs 
+    intialRouteName="home"
+    screenOptions={{
+        tabBarActiveTintColor: '#131620',
+        tabBarLabelStyle: { fontSize: 14, fontWeight: 'bold', textTransform: 'capitalize' },
+        tabBarIndicatorStyle: { backgroundColor: '#1C87ED'}
+    }}>
+        <MaterialTopTabs.Screen name="theCrew" options={{title: "The Crew"}} />
+        <MaterialTopTabs.Screen name="home" options={{title: "Home"}} />
+        <MaterialTopTabs.Screen name="reviewPage" options={{title: "Review"}} />
+        
     </MaterialTopTabs>
 )
 
