@@ -24,6 +24,7 @@ import { Stack } from 'expo-router'
 import { tinoImg, tinoMoan } from '../assets/index';
 
 const Layout = () => {
+
     const animation = useRef(new Animated.Value(0)).current;
 
     const playSound = async () => {

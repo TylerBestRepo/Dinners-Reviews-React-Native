@@ -16,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "dinner-reviews"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,6 +31,15 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "bf0dd69a-4c3c-4529-8a95-071d80f00f1c"
+      }
+    },
+    "owner": "tony_rabbit"
   }
 }

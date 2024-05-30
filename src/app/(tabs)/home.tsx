@@ -8,6 +8,10 @@ import { tinoImg, tinoMoan, stuImg, frankImg, tylerImg, mushImg, mattImg, mcnibb
 import { IHostedDinners } from '../../interfaces';
 import React, { useRef, useState, useEffect } from 'react'
 
+import InputTextField from '../../components/InputTextField';
+import axios from 'axios';
+
+
 const index = () => {
     const insets = useSafeAreaInsets();
     const animation = useRef(new Animated.Value(0)).current;
@@ -62,6 +66,43 @@ const index = () => {
             { rotate: interpolatedRotateAnimation },
         ],
     };
+
+    const [title, setTitle] = useState('');
+    const [body, setBody] = useState('');
+
+    const handleChildDataTitle = (field, data) => {
+        setTitle(prevState => (data));
+    }
+    const handleChildDataBody = (field, data) => {
+        setBody(prevState => (data));
+    }
+
+    const sendNotif = async () => {
+        const url = 'https://app.nativenotify.com/api/notification';
+
+        console.log("Would be sending the notification here")
+
+        const notificationData = {
+            appId: 21206,
+            appToken: "FhEKCTFXyidkxbixUvCS9w",
+            dateSent: new Date().toLocaleString(),
+            title: title,
+            body: body,
+        };
+
+        try {
+            const response = await axios.post(url, notificationData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+
+    }
+
 
     const [dinners, setDinners] = useState<IHostedDinners[]>([]); // Initialize state for members array
     useEffect(() => {
@@ -150,6 +191,19 @@ const index = () => {
                         />
                     </TouchableOpacity>
                 </View> */}
+                <View>
+                    <Text style={styles.header}>
+                        Temporary API notification testing. Might need to look into expo push notifications
+                    </Text>
+                    <InputTextField field="Notification Title" onEmit={handleChildDataTitle} />
+                    <InputTextField field="Notification sub message" onEmit={handleChildDataBody} />
+
+                    <TouchableOpacity style={styles.button} onPress={sendNotif}>
+                        <Text style={styles.button}>Submit</Text>
+                    </TouchableOpacity>
+
+                </View>
+
                 <View style={styles.upcomingContainer}>
                     <View style={styles.upcoming}>
                         <Text style={styles.header}>Upcoming:</Text>
@@ -259,5 +313,13 @@ const styles = StyleSheet.create({
     },
     boldText: {
         fontWeight: 'bold',
+    },
+    button: {
+        fontSize: 20,
+        color: 'black',
+        backgroundColor: '#ADD8E6',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8
     },
 })

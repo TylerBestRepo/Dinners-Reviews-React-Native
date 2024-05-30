@@ -68,17 +68,21 @@ export default function reviewPage() {
                 const membersArray = await getMembers();
                 setMembers(membersArray); // Set state with the returned array
                 const names = membersArray.map((member) => member.name);
+                console.log("member names, need to filter out guests unless it is their day", membersArray)
                 setMemberNames(names); // Set state with member names
 
                 const nextDinner = await getNextDinner();
                 setNextDinner(nextDinner)
                 
-                const mysteryQ = await getMysteryQ(nextDinner.season,nextDinner.weekNumber);
-                setInputFieldData(prevState => ({
-                    ...prevState,
-                    mysteryQ: mysteryQ.mysteryQuestion,
-                    mysteryQuestionType: mysteryQ.mysteryQuestionType
-                }));
+                const mysteryQ = await getMysteryQ(nextDinner.season, nextDinner.weekNumber);
+                if (mysteryQ) {
+                    setInputFieldData(prevState => ({
+                        ...prevState,
+                        mysteryQ: mysteryQ.mysteryQuestion,
+                        mysteryQuestionType: mysteryQ.mysteryQuestionType
+                    }));
+                }
+                
 
             } catch (error) {
                 console.error('Error fetching members:', error);
