@@ -1,29 +1,35 @@
-// import { Stack } from "expo-router";
-// import { NavigationContainer } from '@react-navigation/native';
-// import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 
-
-// const RootLayout = () => {
-//     return (
-
-//         <Stack
-//             screenOptions={{ headerTitle: "", animation: "ios" }}>
-//             <Stack.Screen name="(tabs)" options={{ headerShown: false, animation: 'slide_from_right' }} />
-//         </Stack>
-
-
-//     );
-// }
-
-// export default RootLayout;\
 
 import { View, Text, Image, StyleSheet, Animated, Easing, TouchableOpacity, ImageStyle } from 'react-native'
 import { Audio } from 'expo-av'; // Import Audio from Expo AV for sound playback
 import React, { useRef, useState, useEffect } from 'react'
 import { Stack } from 'expo-router'
 import { tinoImg, tinoMoan } from '../assets/index';
+import registerNNPushToken from 'native-notify';
+
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+import Login from './login';
+import LayoutTabs from './(tabs)/_layout';
+
 
 const Layout = () => {
+    registerNNPushToken(21206, 'FhEKCTFXyidkxbixUvCS9w');
+    const [user, setUser] = useState<User | null>(null)
+
+    useEffect(() => {
+        onAuthStateChanged(FIREBASE_AUTH, (user) => {
+            console.log('user', user)
+            setUser(user)
+        })
+    }, [])
+
+    const AuthStack = createStackNavigator();
+    const AppStack = createStackNavigator();
 
     const animation = useRef(new Animated.Value(0)).current;
 
@@ -110,9 +116,16 @@ const Layout = () => {
                 <Text></Text>
             ),
             headerShadowVisible: false,
-        }}>
+        }}> 
+
             <Stack.Screen name='(tabs)' />
+            {/* {user && <Stack.Screen name='(tabs)' />}
+            {!user && <Stack.Screen name='login'/>} */}
         </Stack>
+
+        // <NavigationContainer>
+        //     {user ? <Layout /> : <Login />}
+        // </NavigationContainer>
     )
 }
 

@@ -5,9 +5,11 @@ import { getMyReviews } from '../../api/gets';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BarChart } from "react-native-gifted-charts";
 import { AntDesign } from '@expo/vector-icons';
+import PropTypes from 'prop-types';
 
 
-const previousReviews = () => {
+
+const previousReviews = ({ userProp = "No email provided" }) => {
     // API gets for previous reviews and show them here
 
     const [reviews, setReviews] = useState<IReviews[]>([]); // Initialize state for members array
@@ -105,6 +107,7 @@ const previousReviews = () => {
                     <Text style={styles.topText}>
                         Season: {review.season}, Week {review.weekNumber}
                     </Text>
+                    {userProp && <Text> User email passed in = {userProp} </Text>}
                 </View>
 
                 <View style={styles.middleContainer}>
@@ -113,7 +116,7 @@ const previousReviews = () => {
                         <TouchableOpacity onPress={() => toggleDropdown(index)}
                             style={{ padding: 8, paddingBottom: 12 }}>
                             <AntDesign name="down" size={12}color={dropdownStates[index] ? 'blue' : 'black'} // Change color when activated
- />
+/>
                         </TouchableOpacity>
 
                     </View>
@@ -151,6 +154,10 @@ const previousReviews = () => {
 
     )
 }
+
+previousReviews.propTypes = {
+    userProp: PropTypes.string,
+};
 
 export default previousReviews
 

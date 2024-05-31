@@ -7,22 +7,21 @@ import {
 } from "react-native";
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { Easing, FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 
 import InputNumberField from '../../components/InputNumberField'
 import InputTextField from '../../components/InputTextField'
 import { SelectList } from 'react-native-dropdown-select-list'
-
+import { User, onAuthStateChanged } from 'firebase/auth';
 import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-
 import { useMemo } from 'react';
-
 import PreviousReviews from "../components/previousReviews";
-
 import { FIREBASE_DB } from "../../../FirebaseConfig";
 import { collection, onSnapshot } from "firebase/firestore";
 import { IMembers, IHostedDinners, IReviewInput } from "../../interfaces";
 import { getMembers, getNextDinner, getMysteryQ } from "../../api/gets";
-
+import { FIREBASE_AUTH } from "../../../FirebaseConfig";
+import Login from "../login";
 
 export default function reviewPage() {
     const snapPoints = useMemo(() => ['50%', '70%', '85%'], []);
@@ -36,6 +35,15 @@ export default function reviewPage() {
         (props: any) => <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />,
         []
     );
+
+    const [user, setUser] = useState<User | null>(null)
+
+    useEffect(() => {
+        onAuthStateChanged(FIREBASE_AUTH, (user) => {
+            console.log('user', user)
+            setUser(user)
+        })
+    }, [])
 
     const membersRef = collection(FIREBASE_DB, "members")
 
@@ -68,7 +76,7 @@ export default function reviewPage() {
                 const membersArray = await getMembers();
                 setMembers(membersArray); // Set state with the returned array
                 const names = membersArray.map((member) => member.name);
-                console.log("member names, need to filter out guests unless it is their day", membersArray)
+                // console.log("member names, need to filter out guests unless it is their day", membersArray)
                 setMemberNames(names); // Set state with member names
 
                 const nextDinner = await getNextDinner();
@@ -121,6 +129,18 @@ export default function reviewPage() {
     const dismissKeyboard = () => {
         Keyboard.dismiss();
     };
+    
+    const signOutOfApp = () => {
+        try {
+            FIREBASE_AUTH.signOut()
+            console.log("Trying to sign out")
+        } catch (error) {
+            console.log("Failed to sign out : ", error)
+            alert('error signout out' + error)
+        } finally {
+            console.log("Should have successfully signed out")
+        }
+    }
 
     // Check if all input fields are filled
     useEffect(() => {
@@ -149,59 +169,76 @@ export default function reviewPage() {
                             <ScrollView
                                 contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
                                 style={styles.scrollContainer}>
+                                <Animated.View
+                                    entering={FadeIn.duration(500).easing(Easing.out(Easing.ease))}
+                                    exiting={FadeOut.duration(500).easing(Easing.in(Easing.ease))}
+                                    layout={Layout.springify()}
+                                >
+                                    {user !== null ? (
+
+                                        <View>
+                                            <View style={styles.header}>
+                                                <View style={{ width: '30%' }}>
+                                                <Button title="sign out" onPress={signOutOfApp}/>
+
+                                                </View>
+                                                <Text style={styles.headerTitle}>It's Review Time!</Text>
+                                                <TouchableOpacity onPress={handleOpenPress} style={[styles.buttonContainer]}>
+                                                    <Text style={styles.buttonText}>Previous</Text>
+                                                </TouchableOpacity>
+                                            </View>
 
 
-                                <View style={styles.header}>
-                                    <View style={{ width: '30%' }}></View>
-                                    <Text style={styles.headerTitle}>It's Review Time!</Text>
-                                    <TouchableOpacity onPress={handleOpenPress} style={[styles.buttonContainer]}>
-                                        <Text style={styles.buttonText}>Previous</Text>
-                                    </TouchableOpacity>
-                                </View>
 
+                                            <View style={styles.dropdownContainer}>
+                                                <View style={styles.dropdownContainer}>
+                                                    {memberNames.length > 0 && <SelectList
+                                                        setSelected={(val) => handleDropdownSelection("reviewer", val)}
+                                                        data={memberNames}
+                                                        save="value"
+                                                        placeholder="Eater"
+                                                        boxStyles={{ width: '50%', alignItems: 'center' }}
+                                                        search={false}
+                                                    />}
+                                                </View>
 
+                                                {inputFields.reviewer !== '' && <SelectList
+                                                    setSelected={(val) => handleDropdownSelection("cook", val)}
+                                                    data={memberNames}
+                                                    save="value"
+                                                    placeholder="Cook"
+                                                    boxStyles={{ width: '50%' }}
+                                                    search={false}
+                                                />}
+                                            </View>
 
-                                <View style={styles.dropdownContainer}>
-                                    <View style={styles.dropdownContainer}>
-                                        {memberNames.length > 0 && <SelectList
-                                            setSelected={(val) => handleDropdownSelection("reviewer", val)}
-                                            data={memberNames}
-                                            save="value"
-                                            placeholder="Eater"
-                                            boxStyles={{ width: '50%', alignItems: 'center' }}
-                                            search={false}
-                                        />}
-                                    </View>
+                                            <View>
+                                                {inputFields.cook !== '' && <InputNumberField field="entreeRating" onEmit={handleChildData} />}
+                                                {inputFields.entreeRating != 0 && <InputNumberField field="mainRating" onEmit={handleChildData} />}
+                                                {inputFields.mainRating != 0 && <InputNumberField field="dessertRating" onEmit={handleChildData} />}
+                                                {inputFields.dessertRating != 0 && <InputNumberField field="entertainmentRating" onEmit={handleChildData} />}
 
-                                    {inputFields.reviewer !== '' && <SelectList
-                                        setSelected={(val) => handleDropdownSelection("cook", val)}
-                                        data={memberNames}
-                                        save="value"
-                                        placeholder="Cook"
-                                        boxStyles={{ width: '50%' }}
-                                        search={false}
-                                    />}
-                                </View>
+                                                {inputFields.entertainmentRating != 0 && <InputTextField field="writtenReview" onEmit={handleChildData} />}
 
-                                <View>
-                                    {inputFields.cook !== '' && <InputNumberField field="entreeRating" onEmit={handleChildData} />}
-                                    {inputFields.entreeRating != 0 && <InputNumberField field="mainRating" onEmit={handleChildData} />}
-                                    {inputFields.mainRating != 0 && <InputNumberField field="dessertRating" onEmit={handleChildData} />}
-                                    {inputFields.dessertRating != 0 && <InputNumberField field="entertainmentRating" onEmit={handleChildData} />}
+                                                {inputFields.writtenReview != '' && inputFields.mysteryQ && inputFields.mysteryQuestionType == 'written' &&
+                                                    <InputTextField field="mysteryQuestion" mysteryQuestion={inputFields.mysteryQ} onEmit={handleChildData} />}
+                                            </View>
 
-                                    {inputFields.entertainmentRating != 0 && <InputTextField field="writtenReview" onEmit={handleChildData} />}
-
-                                    {inputFields.writtenReview != '' && inputFields.mysteryQ && inputFields.mysteryQuestionType == 'written' && 
-                                    <InputTextField field="mysteryQuestion" mysteryQuestion={inputFields.mysteryQ} onEmit={handleChildData} />}
-                                </View>
-
-                                {/* <Button title="Submit"
+                                            {/* <Button title="Submit"
                 onPress={logInputs} /> */}
-                                {allFieldsFilled == true && <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 16, paddingBottom: 200 }}>
-                                    <TouchableOpacity style={styles.button} onPress={logInputs}>
-                                        <Text style={styles.button}>Submit</Text>
-                                    </TouchableOpacity>
-                                </View>}
+                                            {allFieldsFilled == true && <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 16, paddingBottom: 200 }}>
+                                                <TouchableOpacity style={styles.button} onPress={logInputs}>
+                                                    <Text style={styles.button}>Submit</Text>
+                                                </TouchableOpacity>
+                                            </View>}
+                                        </View>
+                                    ) :
+                                        (
+                                            <Login />
+                                        )}
+
+                                </Animated.View>
+
                             </ScrollView>
                         </KeyboardAvoidingView>
 
@@ -220,8 +257,12 @@ export default function reviewPage() {
                     backdropComponent={renderBackdrop}
                 >
                     <View style={styles.contentContainer}>
-                        <PreviousReviews />
-                        {/* <Button title="Close" onPress={handleClosePress} /> */}
+                        {/* <PreviousReviews userProp={user.email}/> */}
+                        {user && user.email ? (
+                            <PreviousReviews userProp={user.email} />
+                        ) : (
+                            <PreviousReviews />
+                        )}
                     </View>
                 </BottomSheet>
             </GestureHandlerRootView>

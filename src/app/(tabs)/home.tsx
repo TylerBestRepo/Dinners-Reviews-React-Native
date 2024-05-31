@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image, Animated, Easing, ImageStyle, ScrollView } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Image, Animated, Easing, ImageStyle, ScrollView, Button } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, Redirect, router } from "expo-router";
 import { Audio } from 'expo-av'; // Import Audio from Expo AV for sound playback
@@ -10,11 +10,22 @@ import React, { useRef, useState, useEffect } from 'react'
 
 import InputTextField from '../../components/InputTextField';
 import axios from 'axios';
+import { FIREBASE_AUTH } from '../../../FirebaseConfig';
+import { User, onAuthStateChanged } from 'firebase/auth';
 
 
-const index = () => {
+const home = () => {
     const insets = useSafeAreaInsets();
     const animation = useRef(new Animated.Value(0)).current;
+
+    const [user, setUser] = useState<User | null>(null)
+
+    useEffect(() => {
+        onAuthStateChanged(FIREBASE_AUTH, (user) => {
+            console.log('user', user)
+            setUser(user)
+        })
+    }, [])
 
     const playSound = async () => {
         try {
@@ -171,6 +182,21 @@ const index = () => {
         ));
     };
 
+    const ApiNotification = () => (
+        <View>
+            <Text style={styles.header}>
+                Temporary API notification testing. Might need to look into expo push notifications
+            </Text>
+            <InputTextField field="Notification Title" onEmit={handleChildDataTitle} />
+            <InputTextField field="Notification sub message" onEmit={handleChildDataBody} />
+
+            <TouchableOpacity style={styles.button} onPress={sendNotif}>
+                <Text style={styles.button}>Submit</Text>
+            </TouchableOpacity>
+
+        </View>
+    )
+
     return (
         <View style={[styles.container, {
             paddingTop: 15,
@@ -178,32 +204,7 @@ const index = () => {
             // paddingBottom: insets.bottom,
         }]}>
             <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollContainer}>
-
-                {/* <Text style={styles.header}>Dinner Reviews</Text> */}
-
-                {/* <View style={styles.imageAndOther}>
-                    <TouchableOpacity onPress={playSound}>
-                        <Animated.Image borderRadius={6}
-                            source={tinoImg}
-                            resizeMode='cover'
-                            //  style={{ height: 200, width: 150, borderRadius: 16 }}
-                            style={[styles.image, animatedStyle]}
-                        />
-                    </TouchableOpacity>
-                </View> */}
-                <View>
-                    <Text style={styles.header}>
-                        Temporary API notification testing. Might need to look into expo push notifications
-                    </Text>
-                    <InputTextField field="Notification Title" onEmit={handleChildDataTitle} />
-                    <InputTextField field="Notification sub message" onEmit={handleChildDataBody} />
-
-                    <TouchableOpacity style={styles.button} onPress={sendNotif}>
-                        <Text style={styles.button}>Submit</Text>
-                    </TouchableOpacity>
-
-                </View>
-
+                {user && user.email == "tyler.best.235@gmail.com" && <ApiNotification />}
                 <View style={styles.upcomingContainer}>
                     <View style={styles.upcoming}>
                         <Text style={styles.header}>Upcoming:</Text>
@@ -211,13 +212,11 @@ const index = () => {
                     <View style={styles.cardsContainer}>{renderDinners()}</View>
                 </View>
             </ScrollView>
-
-
         </View>
     )
 }
 
-export default index
+export default home
 const styles = StyleSheet.create({
     container: {
         backgroundColor: "white",
