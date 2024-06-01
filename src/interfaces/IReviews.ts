@@ -14,7 +14,7 @@ export interface IReviews {
     mysteryQuestionType?: string,
     mysteryRating?: number,
     mysteryAnswer?: string,
-    chartInfo: ChartInfoItem[]; // Define the type of chartInfo here
+    chartInfo?: ChartInfoItem[]; // Define the type of chartInfo here
 }
 
 type ChartInfoItem = {

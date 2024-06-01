@@ -1,11 +1,13 @@
 import { FIREBASE_DB } from "../../FirebaseConfig";
-import { collection, onSnapshot, query, Query, where } from "firebase/firestore";
-import { IMembers, IHostedDinners, IReviews, IMysteryQuestion } from '../interfaces/index'
+import { collection, onSnapshot, query, Query, where, Timestamp, limit, orderBy } from "firebase/firestore";
+import { IMembers, IHostedDinners, IReviews, IMysteryQuestion, IReviewWeighting } from '../interfaces/index'
 
 const membersRef = collection(FIREBASE_DB, "members");
 const dinnersRef = collection(FIREBASE_DB, "hostedDinners");
 const membersReviewRef = collection(FIREBASE_DB, 'ratings')
 const mysteryQsRef = collection(FIREBASE_DB, 'mysteryQs')
+const reviewWeightingRef = collection(FIREBASE_DB, 'weighting')
+
 
 export const getMembers = (): Promise<IMembers[]> => {
     return new Promise((resolve, reject) => {
@@ -15,7 +17,8 @@ export const getMembers = (): Promise<IMembers[]> => {
                 const member: IMembers = {
                     id: doc.id,
                     name: doc.data().name,
-                    imgName: doc.data().imgName
+                    imgName: doc.data().imgName,
+                    email: doc.data().email
                 };
                 localMembers.push(member);
             });
@@ -77,6 +80,37 @@ export const getNextDinner = (): Promise<IHostedDinners> => {
         }, reject);
     });
 };
+export const getTodaysDinner = (): Promise<IHostedDinners> => {
+    const today = new Date(); // Get the current date
+    today.setHours(0, 0, 0, 0); // Set time to midnight for accurate comparison
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    let todayDinnerQuery = query(dinnersRef, where('date', '>=', Timestamp.fromDate(today)), where('date', '<=', Timestamp.fromDate(tomorrow)), limit(1));
+    
+    return new Promise((resolve, reject) => {
+        const localHostedDinners: IHostedDinners[] = [];
+        onSnapshot(todayDinnerQuery, (querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const hostedDinner: IHostedDinners = {
+                    id: doc.id,
+                    date: doc.data().date.toDate(), // Assuming date is already a Date object
+                    hostName: doc.data().hostName,
+                    weekNumber: doc.data().weekNumber,
+                    season: doc.data().season
+                };
+                // Check if the dinner date is in the future
+                localHostedDinners.push(hostedDinner);
+            });
+            
+            // Sort the dinners by date (newest first)
+            resolve(localHostedDinners[0]);
+        }, reject);
+    });
+};
+
+
 export const getMyReviews = (user: string): Promise<IReviews[]> => {
     return new Promise((resolve, reject) => {
         let userReviewQuery: Query;
@@ -147,5 +181,26 @@ export const getMysteryQ = (season: number, weekNumber: number): Promise<IMyster
         }, reject);
     });
 };
+export const getWeighting = (): Promise<IReviewWeighting> => {
+    return new Promise((resolve, reject) => {
+        let weightingVals: IReviewWeighting;
+        onSnapshot(reviewWeightingRef, (querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const weighting: IReviewWeighting = {
+                    id: doc.id,
+                    entreeWeighting: doc.data().entreeWeighting,
+                    mainWeighting: doc.data().mainWeighting,
+                    dessertWeighting: doc.data().dessertWeighting,
+                    entertainmentWeighting: doc.data().entertainmentWeighting
+
+                };
+                weightingVals = weighting;
+            });
+            resolve(weightingVals);
+        }, reject);
+    });
+};
+
+
 
 

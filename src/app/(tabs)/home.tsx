@@ -22,7 +22,6 @@ const home = () => {
 
     useEffect(() => {
         onAuthStateChanged(FIREBASE_AUTH, (user) => {
-            console.log('user', user)
             setUser(user)
         })
     }, [])
@@ -91,8 +90,6 @@ const home = () => {
     const sendNotif = async () => {
         const url = 'https://app.nativenotify.com/api/notification';
 
-        console.log("Would be sending the notification here")
-
         const notificationData = {
             appId: 21206,
             appToken: "FhEKCTFXyidkxbixUvCS9w",
@@ -107,7 +104,6 @@ const home = () => {
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(response.data);
         } catch (error) {
             console.error(error);
         }

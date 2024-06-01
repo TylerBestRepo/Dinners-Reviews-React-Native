@@ -6,15 +6,19 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { BarChart } from "react-native-gifted-charts";
 import { AntDesign } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
+import { getWeighting, getMembers } from "../../api/gets";
+import { getAuth } from 'firebase/auth'; // Import the Firebase Auth module
 
 
 
-const previousReviews = ({ userProp = "No email provided" }) => {
+const previousReviews = ({ userProp }) => {
     // API gets for previous reviews and show them here
 
     const [reviews, setReviews] = useState<IReviews[]>([]); // Initialize state for members array
     const [dropdownStates, setDropdownStates] = useState(reviews.map(() => false)); // State for dropdown visibility, one state per review
     const [dropdownHeights, setDropdownHeights] = useState(reviews.map(() => new Animated.Value(0)));
+
+    const [userName, setUserName] = useState(null)
 
     const toggleDropdown = (index) => {
         setDropdownStates((prevState) => {
@@ -33,44 +37,54 @@ const previousReviews = ({ userProp = "No email provided" }) => {
     };
 
 
-    let data = [{
-        label: 'Entree', frontColor: 'red',
-        value: 1
-    },
-    {
-        label: 'Main', frontColor: 'red',
-        value: 4
-    },
-    {
-        label: 'Dessert', frontColor: 'red',
-        value: 4
-    },
-    {
-        label: 'Entertainment', frontColor: '#177AD5',
-        value: 8
-    }
-    ]
 
-    let dataItem = []
-
-    const barData = [
-        { value: 250, label: 'M' },
-        { value: 500, label: 'T', frontColor: '#177AD5' },
-        { value: 745, label: 'W', frontColor: '#177AD5' },
-        { value: 320, label: 'T' },
-        { value: 600, label: 'F', frontColor: '#177AD5' },
-        { value: 256, label: 'S' },
-        { value: 300, label: 'S' },
-    ];
 
     useEffect(() => {
         const fetchDinners = async () => {
             try {
-                const reviewsArray = await getMyReviews('Tyler Best');
-                setReviews(reviewsArray); // Set state with the returned array
+                const membersArray = await getMembers();
+                let matchingMember;
+
+                if (userProp == undefined) {
+                    const actualUser = getAuth()                    
+                    if (actualUser.currentUser && actualUser.currentUser.email) {
+                        matchingMember = membersArray.find(member => member.email === actualUser.currentUser.email);
+
+                    } 
+                }
+                const weighting = await getWeighting();
+                let reviewsArray;
+                if (userProp != undefined) {
+                    reviewsArray = await getMyReviews(userProp);
+                } else if (matchingMember) {
+                    reviewsArray = await getMyReviews(matchingMember.name);
+                }
+
+                const reviewsWithAverage = reviewsArray.map(review => {
+                    // Calculate total rating for each review
+                    const totalRating = review.entreeRating * weighting.entreeWeighting +
+                        review.mainRating * weighting.mainWeighting +
+                        review.dessertRating * weighting.dessertWeighting +
+                        review.entertainmentRating * weighting.entertainmentWeighting;
+                
+                    // Add totalRating to chartInfo in the correct format
+                    const updatedChartInfo = [...review.chartInfo, {
+                        label: 'Average',
+                        frontColor: 'black', // Choose an appropriate color
+                        value: totalRating
+                    }];
+                
+                    return {
+                        ...review,
+                        chartInfo: updatedChartInfo
+                    };
+                });
+                setReviews(reviewsWithAverage); // Set state with the returned array
+
+                
 
                 // Initialize dropdownHeights after reviews have been fetched
-                setDropdownHeights(reviewsArray.map(() => new Animated.Value(0)));
+                setDropdownHeights(reviewsWithAverage.map(() => new Animated.Value(0)));
             } catch (error) {
                 console.error('Error fetching members:', error);
             }
@@ -107,7 +121,6 @@ const previousReviews = ({ userProp = "No email provided" }) => {
                     <Text style={styles.topText}>
                         Season: {review.season}, Week {review.weekNumber}
                     </Text>
-                    {userProp && <Text> User email passed in = {userProp} </Text>}
                 </View>
 
                 <View style={styles.middleContainer}>
@@ -121,14 +134,14 @@ const previousReviews = ({ userProp = "No email provided" }) => {
 
                     </View>
                     {dropdownStates[index] && (
-                        <Animated.View style={[styles.dropdownContent, { height: dropdownHeights[index] }]}>
+                        <Animated.View style={[styles.dropdownContent, { height: 'auto' }]}>
                             <Text>{review.writtenReview}</Text>
                         </Animated.View>
                     )}
                 </View>
                 <View style={styles.chartContainer}>
                     {<BarChart
-                        barWidth={50}
+                        barWidth={35}
                         noOfSections={10}
                         barBorderRadius={4}
                         frontColor="lightgray"

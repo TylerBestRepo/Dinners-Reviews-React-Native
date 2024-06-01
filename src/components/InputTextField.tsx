@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
     fieldTitlesMystery: {
         fontSize: 20,
         fontWeight: '500',
-        marginTop: 100
+        paddingTop: 100
     }
 });
